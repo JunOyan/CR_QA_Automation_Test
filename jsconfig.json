@@ -1,0 +1,9 @@
+{
+    "include": [
+        "./node_modules/cypress", 
+        "./node_modules/cypress-xpath",
+        "./node_modules/base-64",
+        "./node_modules/cypress-real-events",
+        "cypress/**/*.js"
+    ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "cypress_nba",
+  "version": "1.0.0",
+  "description": "A Cypress test automation for NBA's website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Billy Chen",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.17.0"
+  },
+  "dependencies": {
+    "base-64": "^1.0.0",
+    "cypress-real-events": "^1.13.0",
+    "cypress-xpath": "^2.0.1"
+  }
+}
