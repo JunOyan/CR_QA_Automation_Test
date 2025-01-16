@@ -3,18 +3,18 @@ import loginPage from "../../page_objects/loginPage.js";
 import registerPage from "../../page_objects/registerPage.js";
 
 describe('Create a New Account', () => {
-  let user_data;
+  let _user_data;
   before("load fixture", function(){
     cy.fixture("userData.json").then((data)=>
     {
-      user_data = data;
+      _user_data = data;
     })
   });
 
   //Expected result: should not be able to create an account
   it('Recaptcha Failed: User Should NOT Be Able to Create an Account', () => {
     //go to sign in page
-    cy.visit(user_data.baseUrl);
+    cy.visit(_user_data.baseUrl);
     homePage.declineTracking();
     homePage.clickSignIn();
 

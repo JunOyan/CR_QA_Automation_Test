@@ -1,10 +1,11 @@
 {
 	"info": {
-		"_postman_id": "9befc756-b95a-482a-a8e6-f1484f13a5b3",
+		"_postman_id": "984fcb0b-e2bf-43fc-b75f-7082b51fcbed",
 		"name": "Data USA - Billy Chen",
 		"description": "A collection of functional and security tests for datausa.io.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40937109"
+		"_exporter_id": "40937109",
+		"_collection_link": "https://www.postman.com/bchenouyang/workspace/billy-chen-s-workspace/collection/40937109-984fcb0b-e2bf-43fc-b75f-7082b51fcbed?action=share&source=collection_link&creator=40937109"
 	},
 	"item": [
 		{
@@ -639,7 +640,7 @@
 							"response": []
 						}
 					],
-					"description": "Queries to extract industry, state, occupation and measures data. Saves them in the collections variables."
+					"description": "Queries to extract industry, state, occupation and measures data. Saves them in the collections variables.\n\nTest Case ID: TC_DATAUSA_001"
 				},
 				{
 					"name": "State Information Tests",

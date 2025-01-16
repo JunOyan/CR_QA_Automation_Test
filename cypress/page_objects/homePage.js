@@ -70,7 +70,7 @@ class homePage{
         nav_my_account_btn: () => cy.xpath("//a[@href='/account/nbaprofile'][@data-text='My Account']"),
         nav_league_pass_btn: () => cy.xpath("//a[@href='/watch/league-pass-stream'] \
         [@data-text='League Pass' and @data-section='navbar']"),
-        nav_tickets_btn: () => cy.xpath("//span[text()='Tickets']/parent::a[@data-text='Tickets']"),
+        nav_tickets_btn: () => cy.xpath("//li[contains(@class, 'NavDropdownChild')]//a[@data-text='Tickets']"),
         nav_free_agent_tracker_link: () => cy.xpath("//a[@data-text='Free Agent Tracker']"),
         nav_nba_play_btn: () => cy.xpath("//span[text()='NBA Play']/parent::a[@data-text='NBA Play']"),
 
@@ -141,6 +141,10 @@ class homePage{
 
     gotoTickets(){
         //Enter Tickets
+        this.elements.nav_games_hover_item()
+        .should('be.visible')
+        .trigger('mouseover');
+
         this.elements.nav_tickets_btn()
         .should('be.visible')
         .invoke('removeAttr', 'target')     //avoids opening a new tab

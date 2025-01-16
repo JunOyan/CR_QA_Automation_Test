@@ -1,18 +1,18 @@
 import homePage from "../../page_objects/homePage.js";
 
 describe('Validate Homepage Navigation Items', () => {
-  let user_data;
+  let _user_data;
   before("load fixture", function(){
     cy.fixture("userData.json").then((data)=>
     {
-      user_data = data;
+      _user_data = data;
     })
   });
   
   //Expected result: all menu items should be present
   it('Navigation Bar Should Have Required Menu Items', () => {
     //go to sign in page
-    cy.visit(user_data.baseUrl);
+    cy.visit(_user_data.baseUrl);
     homePage.declineTracking();
 
     //validations

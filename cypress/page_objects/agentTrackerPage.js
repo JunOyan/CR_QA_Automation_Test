@@ -44,6 +44,7 @@ class agentTrackerPage{
         cy.get("div#search-container-mobile")
         .invoke("css", "display", "inline");
         
+        //input the player name
         if (name.length == 0 || name == "random"){
             this.getRandomPlayerName();
             this.elements.search_bar_textfield().should('be.visible').then(($el)=>{
