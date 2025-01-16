@@ -23,3 +23,15 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+/**
+ * Returns the iframe document of the specified path
+ * @{params} xpath_locator (string): the string locator of the iframe
+ */
+Cypress.Commands.add('getIframe', (locator) => {
+    return cy
+    .get(locator)
+    .its('0.contentDocument.body').should('not.be.empty')
+    //wraps document body and return it
+    .then(cy.wrap);
+});

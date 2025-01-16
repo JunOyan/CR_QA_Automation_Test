@@ -68,8 +68,11 @@ class homePage{
         nav_games_btn: () => cy.xpath("//a[@href='/games'][@data-text='Games']"),
         nav_stats101_btn: () => cy.xpath("//a[@href='/stats/help/glossary'][@data-text='Stats 101']"),
         nav_my_account_btn: () => cy.xpath("//a[@href='/account/nbaprofile'][@data-text='My Account']"),
-        nav_league_pass_btn: () => cy.xpath("//a[@href='/watch/league-pass-stream'][@data-text='League Pass']"),
+        nav_league_pass_btn: () => cy.xpath("//a[@href='/watch/league-pass-stream'] \
+        [@data-text='League Pass' and @data-section='navbar']"),
         nav_tickets_btn: () => cy.xpath("//span[text()='Tickets']/parent::a[@data-text='Tickets']"),
+        nav_free_agent_tracker_link: () => cy.xpath("//a[@data-text='Free Agent Tracker']"),
+        nav_nba_play_btn: () => cy.xpath("//span[text()='NBA Play']/parent::a[@data-text='NBA Play']"),
 
         //Tracking widget pop-up
         banner_tracking_widget: () => cy.get("#onetrust-banner-sdk", {timeout:8000}),
@@ -100,8 +103,9 @@ class homePage{
 
     goToLeaguePass(){
         //Enter League Pass
-        this.elements.nav_league_pass_btn().should('be.visible');
-        this.elements.nav_league_pass_btn().click();
+        this.elements.nav_league_pass_btn()
+        .should('be.visible')
+        .click();
     };
 
     gotoGames(){
@@ -110,10 +114,22 @@ class homePage{
         this.elements.nav_games_btn().click();
     };
 
+    gotoNBAPlay(){
+        //Enter NBA Play
+        this.elements.nav_nba_play_btn()
+        .should('be.visible')
+        .invoke('removeAttr', 'target')     //avoids opening a new tab
+        .click();
+        cy.url().should('include', 'play');
+    }
+
     gotoStore(){
         //Enter Store
-        this.elements.nav_store_btn().should('be.visible');
-        this.elements.nav_store_btn().click();
+        this.elements.nav_store_btn()
+        .should('be.visible')
+        .invoke('removeAttr', 'target')     //avoids opening a new tab
+        .click();
+        cy.url().should('include', 'store');
     };
 
     gotoStats101(){
@@ -125,8 +141,18 @@ class homePage{
 
     gotoTickets(){
         //Enter Tickets
-        this.elements.nav_tickets_btn().should('be.visible');
-        this.elements.nav_tickets_btn().click();
+        this.elements.nav_tickets_btn()
+        .should('be.visible')
+        .invoke('removeAttr', 'target')     //avoids opening a new tab
+        .click();
+        cy.url().should('include', 'nbatickets');
+    };
+
+    goToFreeAgentTracker(){
+        //Go to players > free agent tracker
+        this.elements.nav_players_hover_item().trigger('mouseover');
+        this.elements.nav_free_agent_tracker_link().should('be.visible');
+        this.elements.nav_free_agent_tracker_link().click();
     };
 }
 

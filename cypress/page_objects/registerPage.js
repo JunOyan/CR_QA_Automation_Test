@@ -33,48 +33,58 @@ class registerPage{
         check_privacy=true, 
         check_ad=true){
         //Input email
-        this.elements.input_email_textfield().should('be.visible');
-        this.elements.input_email_textfield().type(email);
+        this.elements.input_email_textfield()
+        .should('be.visible')
+        .type(email);
 
         //Input password
-        this.elements.input_pwd_textfield().should('be.visible');
-        this.elements.input_pwd_textfield().type(password);
+        this.elements.input_pwd_textfield()
+        .should('be.visible')
+        .type(password);
 
         //Input first name
-        this.elements.input_first_name_textfield().should('be.visible');
-        this.elements.input_first_name_textfield().type(first_name);
+        this.elements.input_first_name_textfield()
+        .should('be.visible')
+        .type(first_name);
 
         //Input last name
-        this.elements.input_last_name_textfield().should('be.visible');
-        this.elements.input_last_name_textfield().type(last_name);
+        this.elements.input_last_name_textfield()
+        .should('be.visible')
+        .type(last_name);
 
         //Select birthdate month
-        this.elements.select_bd_month_dropdown().should('be.visible');
-        this.elements.select_bd_month_dropdown().select(birth_month);
+        this.elements.select_bd_month_dropdown()
+        .should('be.visible')
+        .select(birth_month);
 
         //Select birthdate year
-        this.elements.select_bd_year_dropdown().should('be.visible');
-        this.elements.select_bd_year_dropdown().select(birth_year);
+        this.elements.select_bd_year_dropdown()
+        .should('be.visible')
+        .select(birth_year);
 
         //Select birthdate year
-        this.elements.select_country_dropdown().should('be.visible');
-        this.elements.select_country_dropdown().select(country);
+        this.elements.select_country_dropdown()
+        .should('be.visible')
+        .select(country);
         
         //check privacy checkbox
         if(check_privacy){
-            this.elements.input_privacy_consent_checkbox().should('be.visible');
-            this.elements.input_privacy_consent_checkbox().click();
+            this.elements.input_privacy_consent_checkbox()
+            .should('be.visible')
+            .click();
         }
 
         //check ads checkbox
         if(check_ad){
-            this.elements.input_email_consent_checkbox().should('be.visible');
-            this.elements.input_email_consent_checkbox().click();
+            this.elements.input_email_consent_checkbox()
+            .should('be.visible')
+            .click();
         }
 
         //Click create account button
-        this.elements.create_account_btn().should('be.visible');
-        this.elements.create_account_btn().click();
+        this.elements.create_account_btn()
+        .should('be.visible')
+        .click();
     }
 }
 

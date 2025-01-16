@@ -6,8 +6,8 @@ import 'cypress-xpath';
  */
 class accountPage{
     elements = {
-        first_name_label: () => cy.xpath("//span[contains(@class, 'ProfileDisplayBlock_label')][text()='First Name']").as('firstNameLabel'),
-        first_name_textfield: () => cy.xpath("@firstNameLabel").xpath("./following-sibling::span")
+        first_name_label: () => cy.xpath("//span[contains(@class, 'ProfileDisplayBlock_label')][text()='First Name']"),
+        first_name_textfield: () => this.elements.first_name_label().xpath("./following-sibling::span")
     };
 };
 

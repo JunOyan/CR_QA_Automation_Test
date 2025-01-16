@@ -10,8 +10,8 @@ describe('Sign In As Existing User', () => {
     })
   });
   
-  //Expected result: should not be able to sign in without recaptcha
-  it('Existing User Should Be Able to Sign In', () => {
+  //Expected result: should be able to sign in
+  it('Recaptcha not required: Existing User Should Be Able to Sign In', () => {
     //go to sign in page
     cy.visit(user_data.baseUrl);
     homePage.declineTracking();
@@ -21,10 +21,33 @@ describe('Sign In As Existing User', () => {
     loginPage.signIn(user_data.email, user_data.password);
 
     //A recaptcha may appear after login
-    cy.xpath(loginPage.elements.sign_in_error_text, {timeout:15000}).then(($element) => {
-        if(!$element.is(':visible') && !$element.length > 0){
-          homePage.elements.nav_profile_icon_hover_item().should('be.visible');
-        }
-    });
+    homePage.elements.nav_profile_icon_hover_item().should('be.visible');
+  });
+
+  //Expected result: should not be able to sign in without recaptcha
+  it('Recaptcha failed: Existing User Should Not Be Able to Sign In', () => {
+    //go to sign in page
+    cy.visit(user_data.baseUrl);
+    homePage.declineTracking();
+    homePage.clickSignIn();
+
+    //input email and password to login
+    loginPage.signIn(user_data.email, user_data.password);
+
+    //A recaptcha may appear after login
+    cy.xpath(loginPage.elements.sign_in_error_text, {timeout:15000}).should('be.visible');
+  });
+
+  //Expected result: should not be able to sign in as a new user
+  it('New User Should Not Be Able to Sign In', ()=>{
+    //go to sign in page
+    cy.visit(user_data.baseUrl);
+    homePage.declineTracking();
+    homePage.clickSignIn();
+
+    //input email and password to login
+    loginPage.signIn("invalidemail@invalid.com", "12345678");
+    cy.xpath(loginPage.elements.sign_in_error_text).should('have.text', 
+      'Invalid email or password. Please try again.')
   });
 })

@@ -1,0 +1,2802 @@
+{
+	"info": {
+		"_postman_id": "9befc756-b95a-482a-a8e6-f1484f13a5b3",
+		"name": "Data USA - Billy Chen",
+		"description": "A collection of functional and security tests for datausa.io.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40937109"
+	},
+	"item": [
+		{
+			"name": "Functional Testing",
+			"item": [
+				{
+					"name": "Extract Data",
+					"item": [
+						{
+							"name": "GetIndustryGroups",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"measures\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?{.*?}}})`, \"s\");\r",
+											"    \r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let search;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    search = extractJSONData(\"search\", scriptContent);\r",
+											"    pm.expect(search).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    //Convert the search json data into a dictionary and store it as a string\r",
+											"    let contentMap = {};\r",
+											"    for(let i = 0; i < search.results.length; i++){\r",
+											"        contentMap[search.results[i].id] = search.results[i].name;\r",
+											"    };\r",
+											"    pm.collectionVariables.set(\"listOfIndustryGroups\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfIndustryGroups\")).to.not.be.empty;\r",
+											"    console.log(\"Saved industry data in Collections as listOfIndustryGroups.\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/PUMS%20Industry/Industry%20Group",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"PUMS%20Industry",
+										"Industry%20Group"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetIndustrySectors",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"settings\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?{.*?}}})`, \"s\");\r",
+											"\r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let search;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    search = extractJSONData(\"search\", scriptContent);\r",
+											"    pm.expect(search).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"//Convert the search data into a dictionary for easy reading and store it as a string\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    let contentMap = {};\r",
+											"    for(let i = 0; i < search.results.length; i++){\r",
+											"        contentMap[search.results[i].id] = search.results[i].name;\r",
+											"    };\r",
+											"    pm.collectionVariables.set(\"listOfIndustrySectors\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfIndustrySectors\")).to.not.be.empty;\r",
+											"    console.log(\"Saved industry data in Collections as listOfIndustrySectors.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/PUMS%20Industry/Industry%20Sector",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"PUMS%20Industry",
+										"Industry%20Sector"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetStateLocations",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"measures\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?{.*?}}})`, \"s\");\r",
+											"    \r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let search;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    search = extractJSONData(\"search\", scriptContent);\r",
+											"    pm.expect(search).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"//Convert the search data into a dictionary for easy reading and store it as a string\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    let contentMap = {};\r",
+											"    for(let i = 0; i < search.results.length; i++){\r",
+											"        contentMap[search.results[i].id] = search.results[i].name;\r",
+											"    };\r",
+											"    pm.collectionVariables.set(\"listOfStates\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfStates\")).to.not.be.empty;\r",
+											"    console.log(\"Saved location data in Collections as listOfStates.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/Geography/State",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"Geography",
+										"State"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetCountyLocations",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"measures\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?{.*?}}})`, \"s\");\r",
+											"    \r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let search;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    search = extractJSONData(\"search\", scriptContent);\r",
+											"    pm.expect(search).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"//Convert the search data into a dictionary for easy reading and store it as a string\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    let contentMap = {};\r",
+											"    for(let i = 0; i < search.results.length; i++){\r",
+											"        contentMap[search.results[i].id] = search.results[i].name;\r",
+											"    };\r",
+											"    pm.collectionVariables.set(\"listOfCounties\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfCounties\")).to.not.be.empty;\r",
+											"    console.log(\"Saved location data in Collections as listOfCounties.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/Geography/County",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"Geography",
+										"County"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetDetailedOccupations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"measures\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?{.*?}}})`, \"s\");\r",
+											"    \r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let search;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    search = extractJSONData(\"search\", scriptContent);\r",
+											"    pm.expect(search).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"//Convert the search data into a dictionary for easy reading and store it as a string\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    let contentMap = {};\r",
+											"    for(let i = 0; i < search.results.length; i++){\r",
+											"        contentMap[search.results[i].id] = search.results[i].name;\r",
+											"    };\r",
+											"    pm.collectionVariables.set(\"listOfOccupations\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfOccupations\")).to.not.be.empty;\r",
+											"    console.log(\"Saved occupational data in Collections as listOfOccupations.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/PUMS%20Occupation/Detailed%20Occupation",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"PUMS%20Occupation",
+										"Detailed%20Occupation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GetMeasures",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"/**\r",
+											" * Extracts the specified key's JSON data from script content.\r",
+											" *\r",
+											" * @param {string} content - The full content of the script element.\r",
+											" * @param {string} keyword - The key to extract from the JSON (e.g., \"measures\").\r",
+											" * @returns {object|null} - The extracted JSON object, or null if not found.\r",
+											" */\r",
+											"function extractJSONData(keyword=String, content=String){\r",
+											"    // Use a regular expression to locate the json data from the request\r",
+											"    const regex = new RegExp(`\"${keyword}\"\\\\s*:\\\\s*({.*?})`, \"s\");\r",
+											"    \r",
+											"    try{\r",
+											"        //find matching content\r",
+											"        const match = content.match(regex);\r",
+											"        let cleanMatch = \"\";\r",
+											"        for(let char of match[1]){\r",
+											"            if(char != \"\\\\\"){\r",
+											"                cleanMatch += char;\r",
+											"            };\r",
+											"        };\r",
+											"\r",
+											"        //if the match exists and the string has value, parse the string into a JSON object.\r",
+											"        match[1] = cleanMatch;\r",
+											"        if (match && match[1]) {\r",
+											"            return JSON.parse(match[1]);\r",
+											"        } else {\r",
+											"            console.warn(`Key \"${keyword}\" not found in the script content.`);\r",
+											"            return null;\r",
+											"        };\r",
+											"    } catch (error) {\r",
+											"        console.error(`Failed to parse JSON for key \"${keyword}\":`, error.message);\r",
+											"            return null;\r",
+											"    };\r",
+											"};\r",
+											"\r",
+											"let measures;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Extracted and parsed data successfully.\", function(){\r",
+											"    //Import cheerio to extract html data\r",
+											"    const cheerio = require('cheerio');\r",
+											"    const response = cheerio.load(pm.response.text());\r",
+											"\r",
+											"    // Extract the content of the <script> element\r",
+											"    const scriptContent = response('script').html();\r",
+											"\r",
+											"    //Invoke extractJSONData to get data on the \"keyword\"\r",
+											"    measures = extractJSONData(\"measures\", scriptContent);\r",
+											"    pm.expect(measures).to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"//Convert the search data into a dictionary for easy reading and store it as a string\r",
+											"pm.test(\"Saved extracted data in collections.\", function(){\r",
+											"    let contentMap = {};\r",
+											"    Object.keys(measures).forEach(key => {\r",
+											"        contentMap[key] = measures[key]\r",
+											"    });\r",
+											"    pm.collectionVariables.set(\"listOfMeasures\", JSON.stringify(contentMap));\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfMeasures\")).to.not.be.empty;\r",
+											"    console.log(\"Saved measures data in Collections as listOfMeasures.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dataUrl}}/PUMS%20Industry/Industry%20Group",
+									"host": [
+										"{{dataUrl}}"
+									],
+									"path": [
+										"PUMS%20Industry",
+										"Industry%20Group"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Queries to extract industry, state, occupation and measures data. Saves them in the collections variables."
+				},
+				{
+					"name": "State Information Tests",
+					"item": [
+						{
+							"name": "CitizenshipByState",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Citizenship':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 0,\r",
+											"                            maximum: 1 \r",
+											"                        },\r",
+											"                        Citizenship:{\r",
+											"                            type: 'string',\r",
+											"                            pattern:'^(Non-)?(Citizen)$'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        Year:{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'Citizenship Status':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        Geography:{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateName')}$`\r",
+											"                        },\r",
+											"                        'ID Geography':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateID')}$`\r",
+											"                        },\r",
+											"                        'Slug Geography':{\r",
+											"                            type: 'string',\r",
+											"                        },\r",
+											"                    },\r",
+											"                    required:['ID Citizenship', 'ID Year', 'Citizenship Status', 'Geography', 'ID Geography']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS 5-year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Citizenship\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Citizenship Status\");\r",
+											"\r",
+											"//If stateID is empty or unrecognized, choose a random key from listOfStates. Must run GetStateLocations.\r",
+											"const geoId = pm.collectionVariables.get(\"stateID\");\r",
+											"if (!geoId.match(/^[0-9]{5}US[0-9]{2}$/)){\r",
+											"    let locations = pm.collectionVariables.get(\"listOfStates\");\r",
+											"    if(locations.length > 0){\r",
+											"        locations = JSON.parse(locations);\r",
+											"        let locationKeys = Object.keys(locations);\r",
+											"        let randomID = locationKeys[locationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"stateID\", randomID);\r",
+											"        pm.collectionVariables.set(\"stateName\", locations[randomID]);\r",
+											"        console.log(`StateID: ${randomID}, StateName: ${locations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfStates' is empty. Please send the request 'GetStateLocations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?Geography={{stateID}}&drilldowns={{drilldownsVal}}&measures={{measurementVal}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "Geography",
+											"value": "{{stateID}}",
+											"description": "State ID"
+										},
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "HouseholdIncomeByState",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Household Income Bucket\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Household Income,Household Income Moe\");\r",
+											"\r",
+											"//If stateID is empty or unrecognized, choose a random key from listOfStates. Must run GetStateLocations.\r",
+											"const geoId = pm.collectionVariables.get(\"stateID\");\r",
+											"if (!geoId.match(/^[0-9]{5}US[0-9]{2}$/)){\r",
+											"    let locations = pm.collectionVariables.get(\"listOfStates\");\r",
+											"    if(locations.length > 0){\r",
+											"        locations = JSON.parse(locations);\r",
+											"        let locationKeys = Object.keys(locations);\r",
+											"        let randomID = locationKeys[locationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"stateID\", randomID);\r",
+											"        pm.collectionVariables.set(\"stateName\", locations[randomID]);\r",
+											"        console.log(`StateID: ${randomID}, StateName: ${locations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfStates' is empty. Please send the request 'GetStateLocations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Household Income Bucket':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 0,\r",
+											"                            maximum: 15\r",
+											"                        },\r",
+											"                        \"Household Income Bucket\":{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        Year:{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'Household Income':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Household Income Moe':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Geography\":{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateName')}$`\r",
+											"                        },\r",
+											"                        'ID Geography':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateID')}$`\r",
+											"                        },\r",
+											"                        'Slug Geography':{\r",
+											"                            type: 'string',\r",
+											"                        },\r",
+											"                    },\r",
+											"                    required:['ID Household Income Bucket', 'ID Year', 'Household Income', 'Geography', 'ID Geography']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS 5-year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?geo={{stateID}}&measure={{measurementVal}}&drilldowns={{drilldownsVal}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "geo",
+											"value": "{{stateID}}",
+											"description": "State ID"
+										},
+										{
+											"key": "measure",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "EmployedPopulationByState",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Year':{\r",
+											"                            type: 'integer',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        Year:{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Gender':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 1,\r",
+											"                            maximum: 2\r",
+											"                        },\r",
+											"                        'Gender':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^(Fe)?[mM](ale)$'\r",
+											"                        },\r",
+											"                        'ID Age':{\r",
+											"                            type:'integer',\r",
+											"                            minimum: 16\r",
+											"                        },\r",
+											"                        Age:{\r",
+											"                            type:'string',\r",
+											"                            pattern: '^[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        \"Geography\":{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateName')}$`\r",
+											"                        },\r",
+											"                        'ID Geography':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('stateID')}$`\r",
+											"                        },\r",
+											"                        'Slug Geography':{\r",
+											"                            type: 'string',\r",
+											"                        },\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Gender', 'ID Workforce Status', 'Total Population', 'Geography', 'ID Geography']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Year,Gender,Age\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Total Population\");\r",
+											"\r",
+											"const geoId = pm.collectionVariables.get(\"stateID\");\r",
+											"\r",
+											"//If stateID is empty or unrecognized, choose a random key from listOfStates. Must run GetStateLocations.\r",
+											"if (!geoId.match(/^[0-9]{5}US[0-9]{2}$/)){\r",
+											"    let locations = pm.collectionVariables.get(\"listOfStates\");\r",
+											"    if(locations.length > 0){\r",
+											"        locations = JSON.parse(locations);\r",
+											"        let locationKeys = Object.keys(locations);\r",
+											"        let randomID = locationKeys[locationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"stateID\", randomID);\r",
+											"        pm.collectionVariables.set(\"stateName\", locations[randomID]);\r",
+											"        console.log(`StateID: ${randomID}, StateName: ${locations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfStates' is empty. Please send the request 'GetStateLocations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?Geography={{stateID}}&drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "Geography",
+											"value": "{{stateID}}",
+											"description": "State ID"
+										},
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Industry Tests",
+					"item": [
+						{
+							"name": "WorkforceByIndustrySector",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"State,Year\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Total Population\");\r",
+											"\r",
+											"//If sectorID is empty or unrecognized, choose a random key from listOfIndustrySectors. Must run GetIndustrySectors.\r",
+											"const sectorId = pm.collectionVariables.get(\"industrySectorID\");\r",
+											"if (!sectorId.match(/^([0-9]{2}\\-)?[0-9]{2}$/)){\r",
+											"    let sectors = pm.collectionVariables.get(\"listOfIndustrySectors\");\r",
+											"    if(sectors.length > 0){\r",
+											"        sectors = JSON.parse(sectors);\r",
+											"        let sectorKeys = Object.keys(sectors);\r",
+											"        let randomID = sectorKeys[sectorKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"industrySectorID\", randomID);\r",
+											"        pm.collectionVariables.set(\"industrySectorName\", sectors[randomID]);\r",
+											"        console.log(`SectorID: ${randomID}, SectorName: ${sectors[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfIndustrySectors' is empty. Please send the request 'GetIndustrySectors' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 2000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//Iterate over all data to find mismatches between State ID and State Names\r",
+											"pm.test(\"All State IDs match State Names\", function(){\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfStates\")).not.to.be.empty;\r",
+											"    statesMap = JSON.parse(pm.collectionVariables.get(\"listOfStates\"));\r",
+											"    for(let i = 0; i < responseBody.data.length; i++){\r",
+											"        if(responseBody.data[i][\"State\"] != \"#null\"){\r",
+											"            pm.expect(responseBody.data[i][\"State\"]).to.eql(statesMap[responseBody.data[i][\"ID State\"]]);\r",
+											"        };\r",
+											"    };\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID State':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^([0-9]{5}US[0-9]{2})?(\\#null)?$'\r",
+											"                        },\r",
+											"                        State:{\r",
+											"                            type: 'string',\r",
+											"                            //further logic can be implemented to derive data from listOfStates here\r",
+											"                            pattern: '[a-zA-Z]+'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('industrySectorID')}$`\r",
+											"                        },\r",
+											"                        'Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('industrySectorName')}$`\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        \"Total Population\":{\r",
+											"                            type: \"integer\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Slug State\":{\r",
+											"                            type: 'string'\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID State', 'ID Industry Sector', 'Total Population', 'ID Workforce Status']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?Industry Sector={{industrySectorID}}&drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "Industry Sector",
+											"value": "{{industrySectorID}}",
+											"description": "Industry Sector ID"
+										},
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "IndustrySectorWagesPerYear",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 2000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//Iterate over all data to find mismatches between Industry Sector ID and Industry Sector Names\r",
+											"pm.test(\"All Industry Sector IDs match Industry Sector Names\", function(){\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfIndustrySectors\")).not.to.be.empty;\r",
+											"    sectorMap = JSON.parse(pm.collectionVariables.get(\"listOfIndustrySectors\"));\r",
+											"    for(let i = 0; i < responseBody.data.length; i++){\r",
+											"        if(responseBody.data[i][\"Industry Sector\"] != \"#null\"){\r",
+											"            pm.expect(responseBody.data[i][\"Industry Sector\"]).to.eql(sectorMap[responseBody.data[i][\"ID Industry Sector\"]]);\r",
+											"        };\r",
+											"    };\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        \"Average Wage\":{\r",
+											"                            type: \"number\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Slug Industry Sector\":{\r",
+											"                            type: 'string'\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Industry Sector', 'Average Wage', 'ID Workforce Status']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Industry Sector,Year\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Average Wage\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "WorkforceByIndustryGroup",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"State,Year\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Total Population\");\r",
+											"\r",
+											"//If groupID is empty or unrecognized, choose a random key from listOfIndustryGroups. Must run GetIndustryGroups.\r",
+											"const groupId = pm.collectionVariables.get(\"industryGroupID\");\r",
+											"if (!groupId.match('[0-9A-Z]')){\r",
+											"    let groups = pm.collectionVariables.get(\"listOfIndustryGroups\");\r",
+											"    if(groups.length > 0){\r",
+											"        groups = JSON.parse(groups);\r",
+											"        let groupKeys = Object.keys(groups);\r",
+											"        let randomID = groupKeys[groupKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"industryGroupID\", randomID);\r",
+											"        pm.collectionVariables.set(\"industryGroupName\", groups[randomID]);\r",
+											"        console.log(`GroupID: ${randomID}, GroupName: ${groups[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfIndustryGroups' is empty. Please send the request 'GetIndustryGroups' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 2000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//Iterate over all data to find mismatches between State ID and State Names\r",
+											"pm.test(\"All State IDs match State Names\", function(){\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfStates\")).not.to.be.empty;\r",
+											"    statesMap = JSON.parse(pm.collectionVariables.get(\"listOfStates\"));\r",
+											"    for(let i = 0; i < responseBody.data.length; i++){\r",
+											"        if(responseBody.data[i][\"State\"] != \"#null\"){\r",
+											"            pm.expect(responseBody.data[i][\"State\"]).to.eql(statesMap[responseBody.data[i][\"ID State\"]]);\r",
+											"        };\r",
+											"    };\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID State':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^([0-9]{5}US[0-9]{2})?(\\#null)?$'\r",
+											"                        },\r",
+											"                        State:{\r",
+											"                            type: 'string',\r",
+											"                            //further logic can be implemented to derive data from listOfStates here\r",
+											"                            pattern: '[a-zA-Z]+'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Industry Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('industryGroupID')}$`\r",
+											"                        },\r",
+											"                        'Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `^${pm.collectionVariables.get('industryGroupName')}$`\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        \"Total Population\":{\r",
+											"                            type: \"integer\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Slug State\":{\r",
+											"                            type: 'string'\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID State', 'ID Industry Group', 'Total Population', 'ID Workforce Status']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?Industry Group={{industryGroupID}}&drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "Industry Group",
+											"value": "{{industryGroupID}}",
+											"description": "Industry Group ID"
+										},
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "IndustryGroupWagesPerYear",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 2000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//Iterate over all data to find mismatches between Industry Group ID and Industry Group Names.\r",
+											"//FAIL: This test case is failing because part of Industry Sector data was input into Industry Group in the API.\r",
+											"pm.test(\"All Industry Group IDs match Industry Group Names\", function(){\r",
+											"    pm.expect(pm.collectionVariables.get(\"listOfIndustryGroups\")).not.to.be.empty;\r",
+											"    groupMap = JSON.parse(pm.collectionVariables.get(\"listOfIndustryGroups\"));\r",
+											"    console.log(groupMap)\r",
+											"    for(let i = 0; i < responseBody.data.length; i++){\r",
+											"        if(responseBody.data[i][\"Industry Group\"] != \"#null\"){\r",
+											"            pm.expect(responseBody.data[i][\"Industry Group\"]).to.eql(groupMap[responseBody.data[i][\"ID Industry Group\"]]);\r",
+											"        };\r",
+											"    };\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Industry Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Industry Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        \"Average Wage\":{\r",
+											"                            type: \"number\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Slug Industry Sector\":{\r",
+											"                            type: 'string'\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Industry Group', 'Average Wage', 'ID Workforce Status']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Industry Group,Year\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Average Wage\");"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Some industry sectors and groups do not have readily available data. Some of the sectors and groups that have information are the following:\n\n- Industry Sectors IDs: 54-56, 928110\n    \n- Industry Groups IDs: 3261, 4853\n    \n\n---\n\nIndustry Sector Codes: [Click Here](https://datausa.io/about/classifications/PUMS%20Industry/Industry%20Sector)\n\nIndustry Group Codes: [Click here](https://datausa.io/about/classifications/PUMS%20Industry/Industry%20Group)"
+				},
+				{
+					"name": "Occupation Tests",
+					"item": [
+						{
+							"name": "EmployedPopulationByOccupation",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Year,Gender\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Total Population,Total Population MOE Appx\");\r",
+											"\r",
+											"//If occupationID is empty or unrecognized, choose a random key from listOfOccupations. Must run GetDetailedOccupations.\r",
+											"const occupationsId = pm.collectionVariables.get(\"occupationID\");\r",
+											"if (!occupationsId.match(/^[0-9A-Z]{6}$/)){\r",
+											"    let occupations = pm.collectionVariables.get(\"listOfOccupations\");\r",
+											"    if(occupations.length > 0){\r",
+											"        occupations = JSON.parse(occupations);\r",
+											"        let occupationKeys = Object.keys(occupations);\r",
+											"        let randomID = occupationKeys[occupationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"occupationID\", randomID);\r",
+											"        pm.collectionVariables.set(\"occupationName\", occupations[randomID]);\r",
+											"        console.log(`OccupationID: ${randomID}, OccupationName: ${occupations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfOccupations' is empty. Please send the request 'GetDetailedOccupations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Gender':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 1,\r",
+											"                            maximum: 2\r",
+											"                        },\r",
+											"                        'Gender':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^(Fe)?[mM](ale)$'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        'ID Nation':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: `01000US`\r",
+											"                        },\r",
+											"                        'Nation':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'United States'\r",
+											"                        },\r",
+											"                        'ID Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationID')}`\r",
+											"                        },\r",
+											"                        'Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationName')}`\r",
+											"                        },\r",
+											"                        'Total Population':{\r",
+											"                            type: \"integer\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        \"Total Population MOE Appx\":{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 0\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Gender', 'ID Nation', 'Total Population', 'ID Workforce Status', 'ID Detailed Occupation']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}&Nation={{nationID}}&Detailed Occupation={{occupationID}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										},
+										{
+											"key": "Nation",
+											"value": "{{nationID}}"
+										},
+										{
+											"key": "Detailed Occupation",
+											"value": "{{occupationID}}",
+											"description": "Occupation ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AverageWagesByOccupation",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear()\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Year,Industry Group\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Average Wage,Average Wage Appx MOE,Total Population,Total Population MOE Appx\");\r",
+											"\r",
+											"//If occupationID is empty or unrecognized, choose a random key from listOfOccupations. Must run GetDetailedOccupations.\r",
+											"const occupationsId = pm.collectionVariables.get(\"occupationID\");\r",
+											"if (!occupationsId.match(/^[0-9A-Z]{6}$/)){\r",
+											"    let occupations = pm.collectionVariables.get(\"listOfOccupations\");\r",
+											"    if(occupations.length > 0){\r",
+											"        occupations = JSON.parse(occupations);\r",
+											"        let occupationKeys = Object.keys(occupations);\r",
+											"        let randomID = occupationKeys[occupationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"occupationID\", randomID);\r",
+											"        pm.collectionVariables.set(\"occupationName\", occupations[randomID]);\r",
+											"        console.log(`OccupationID: ${randomID}, OccupationName: ${occupations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfOccupations' is empty. Please send the request 'GetDetailedOccupations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Industry Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Industry Sub-Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Industry Sub-Sector':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Industry Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Industry Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        'ID Major Occupation Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Major Occupation Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Minor Occupation Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Minor Occupation Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Broad Occupation':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[0-9\\-,]'\r",
+											"                        },\r",
+											"                        'Broad Occupation':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z\\-,&]'\r",
+											"                        },\r",
+											"                        'ID Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationID')}`\r",
+											"                        },\r",
+											"                        'Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationName')}`\r",
+											"                        },\r",
+											"                        'Average Wage':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Average Wage Appx MOE':{\r",
+											"                            type: ['number', 'null'],\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Total Population':{\r",
+											"                            type: \"integer\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Total Population MOE Appx':{\r",
+											"                            type: ['number', 'null'],\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Slug Industry Group':{\r",
+											"                            type: 'string'\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Industry Sector', 'ID Industry Sub-Sector', 'ID Industry Group', 'Total Population', 'ID Workforce Status', 'ID Detailed Occupation', 'ID Major Occupation Group', 'ID Minor Occupation Group', 'ID Broad Occupation', 'Average Wage']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}&Detailed Occupation={{occupationID}}&parents=true&debug=true",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										},
+										{
+											"key": "Detailed Occupation",
+											"value": "{{occupationID}}",
+											"description": "Occupation ID"
+										},
+										{
+											"key": "parents",
+											"value": "true"
+										},
+										{
+											"key": "debug",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "EducationByOccupation",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"console.clear();\r",
+											"\r",
+											"//Set recognized drilldowns and measures\r",
+											"pm.collectionVariables.set(\"drilldownsVal\", \"Year,Group,Gender\");\r",
+											"pm.collectionVariables.set(\"measurementVal\", \"Total Population,Total Population MOE Appx\");\r",
+											"\r",
+											"//If occupationID is empty or unrecognized, choose a random key from listOfOccupations. Must run GetDetailedOccupations.\r",
+											"const occupationsId = pm.collectionVariables.get(\"occupationID\");\r",
+											"if (!occupationsId.match(/^[0-9A-Z]{6}$/)){\r",
+											"    let occupations = pm.collectionVariables.get(\"listOfOccupations\");\r",
+											"    if(occupations.length > 0){\r",
+											"        occupations = JSON.parse(occupations);\r",
+											"        let occupationKeys = Object.keys(occupations);\r",
+											"        let randomID = occupationKeys[occupationKeys.length * Math.random() << 0];\r",
+											"        pm.collectionVariables.set(\"occupationID\", randomID);\r",
+											"        pm.collectionVariables.set(\"occupationName\", occupations[randomID]);\r",
+											"        console.log(`OccupationID: ${randomID}, OccupationName: ${occupations[randomID]}`);\r",
+											"    } else {\r",
+											"        throw new Error(\"Collections variable 'listOfOccupations' is empty. Please send the request 'GetDetailedOccupations' in folder 'ExtractData'.\");\r",
+											"    };\r",
+											"};\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseBody;\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function(){\r",
+											"    pm.expect(pm.response.code).to.eql(200);\r",
+											"});\r",
+											"\r",
+											"//Performance test for loading times\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"//Response body must be JSON\r",
+											"pm.test(\"Response body is JSON\", function(){\r",
+											"    pm.response.to.be.json;\r",
+											"    responseBody = pm.response.json()\r",
+											"});\r",
+											"\r",
+											"//JSON must follow schema\r",
+											"pm.test(\"Schema is valid\", function(){\r",
+											"    const schema = {\r",
+											"        type: 'object',\r",
+											"        properties: {\r",
+											"            data:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        'ID Year':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 2010,\r",
+											"                            maximum: 2024\r",
+											"                        },\r",
+											"                        'Year':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^20[0-9]{2}$'\r",
+											"                        },\r",
+											"                        'ID Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z]'\r",
+											"                        },\r",
+											"                        'Group':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '[a-zA-Z]'\r",
+											"                        },\r",
+											"                        'ID Gender':{\r",
+											"                            type: 'number',\r",
+											"                            minimum: 1,\r",
+											"                            maximum: 2\r",
+											"                        },\r",
+											"                        'Gender':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: '^(Fe)?[mM](ale)$'\r",
+											"                        },\r",
+											"                        'ID Workforce Status':{\r",
+											"                            type: 'boolean',\r",
+											"                            default: true\r",
+											"                        },\r",
+											"                        'Workforce Status':{\r",
+											"                            type: 'string',\r",
+											"                            pattern: 'true'\r",
+											"                        },\r",
+											"                        'ID Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationID')}`\r",
+											"                        },\r",
+											"                        'Detailed Occupation':{\r",
+											"                            type:'string',\r",
+											"                            pattern:`${pm.collectionVariables.get('occupationName')}`\r",
+											"                        },\r",
+											"                        'Total Population':{\r",
+											"                            type: \"integer\",\r",
+											"                            minimum: 0\r",
+											"                        },\r",
+											"                        'Total Population MOE Appx':{\r",
+											"                            type: ['number', 'null'],\r",
+											"                            minimum: 0\r",
+											"                        }\r",
+											"                    },\r",
+											"                    required:['ID Year', 'ID Gender', 'Total Population', 'ID Workforce Status', 'ID Detailed Occupation']\r",
+											"                },\r",
+											"            },\r",
+											"            source:{\r",
+											"                type: 'array',\r",
+											"                items: {\r",
+											"                    type: 'object',\r",
+											"                    properties: {\r",
+											"                        measures:{\r",
+											"                            type: 'array',\r",
+											"                            items:{\r",
+											"                                type: 'string'\r",
+											"                            }\r",
+											"                        },\r",
+											"                        annotations:{\r",
+											"                            type: 'object',\r",
+											"                            properties: {\r",
+											"                                'source_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'Census Bureau'\r",
+											"                                },\r",
+											"                                'dataset_name':{\r",
+											"                                    type:'string',\r",
+											"                                    pattern:'ACS PUMS 5-Year Estimate'\r",
+											"                                }\r",
+											"                            },\r",
+											"                            required: ['source_name', 'dataset_name', 'dataset_link']\r",
+											"                        },\r",
+											"                        name:{\r",
+											"                            type: 'string'\r",
+											"                        },\r",
+											"                        substitutions:{\r",
+											"                            type: 'array'\r",
+											"                        }\r",
+											"                    }\r",
+											"                }\r",
+											"            }\r",
+											"        },\r",
+											"        required: ['data', 'source'],\r",
+											"        additionalProperties: false\r",
+											"    };\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures={{measurementVal}}&Workforce Status={{workforceStatus}}&Detailed Occupation={{occupationID}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"data"
+									],
+									"query": [
+										{
+											"key": "drilldowns",
+											"value": "{{drilldownsVal}}"
+										},
+										{
+											"key": "measures",
+											"value": "{{measurementVal}}"
+										},
+										{
+											"key": "Workforce Status",
+											"value": "{{workforceStatus}}"
+										},
+										{
+											"key": "Detailed Occupation",
+											"value": "{{occupationID}}",
+											"description": "Occupation ID"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Security Testing",
+			"item": [
+				{
+					"name": "sqlInjection",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/data?drilldowns={{drilldownsVal}}&measures=Population\" ' OR ' 1 '=' 1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"data"
+							],
+							"query": [
+								{
+									"key": "drilldowns",
+									"value": "{{drilldownsVal}}"
+								},
+								{
+									"key": "measures",
+									"value": "Population\" ' OR ' 1 '=' 1",
+									"description": "An attempt to obtain random data"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://datausa.io/api",
+			"type": "default"
+		},
+		{
+			"key": "dataUrl",
+			"value": "https://datausa.io/about/classifications",
+			"type": "string"
+		},
+		{
+			"key": "stateID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "industryGroupID",
+			"value": ""
+		},
+		{
+			"key": "industrySectorID",
+			"value": ""
+		},
+		{
+			"key": "occupationID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "stateName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "industryGroupName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "industrySectorName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "occupationName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "nationID",
+			"value": "01000US",
+			"type": "string"
+		},
+		{
+			"key": "drilldownsVal",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "measurementVal",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "workforceStatus",
+			"value": "true",
+			"type": "string"
+		},
+		{
+			"key": "listOfMeasures",
+			"value": ""
+		},
+		{
+			"key": "listOfIndustryGroups",
+			"value": ""
+		},
+		{
+			"key": "listOfIndustrySectors",
+			"value": ""
+		},
+		{
+			"key": "listOfOccupations",
+			"value": ""
+		},
+		{
+			"key": "listOfStates",
+			"value": ""
+		},
+		{
+			"key": "listOfCounties",
+			"value": ""
+		}
+	]
+}

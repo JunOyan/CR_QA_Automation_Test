@@ -12,10 +12,11 @@ describe('Search for a Glossary Term', () => {
   
   //Expected result: User should be able to find an existing term
   it('User Should Be Able to Search for a Glossary Term', () => {
-    //go to sign in page
+    //go to home page
     cy.visit(user_data.baseUrl);
     homePage.declineTracking();
     homePage.gotoStats101();
     
+    statsPage.searchForTerms("%FTM");
   });
 })

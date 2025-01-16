@@ -12,8 +12,9 @@ class gamePage{
     
     //Toggle the "Hide Score" switch
     toggleScores(){
-        this.elements.scores_toggle().should('be.visible');
-        this.elements.scores_toggle().click();
+        this.elements.scores_toggle()
+        .should('be.visible')
+        .click();
         cy.wait(1000);
     };
 
