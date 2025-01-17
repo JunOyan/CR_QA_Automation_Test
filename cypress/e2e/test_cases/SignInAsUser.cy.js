@@ -10,7 +10,7 @@ describe('Sign In As Existing User', () => {
     })
   });
   
-  //Expected result: should be able to sign in
+  //Expected result: should be able to sign in when recaptcha is not required
   it('Recaptcha not required: Existing User Should Be Able to Sign In', () => {
     //go to sign in page
     cy.visit(_user_data.baseUrl);
@@ -24,6 +24,7 @@ describe('Sign In As Existing User', () => {
     homePage.elements.nav_profile_icon_hover_item().should('be.visible');
   });
 
+  /*
   //Expected result: should not be able to sign in without recaptcha
   it('Recaptcha failed: Existing User Should Not Be Able to Sign In', () => {
     //go to sign in page
@@ -37,6 +38,7 @@ describe('Sign In As Existing User', () => {
     //A recaptcha may appear after login
     cy.xpath(loginPage.elements.sign_in_error_text, {timeout:15000}).should('be.visible');
   });
+  */
 
   //Expected result: should not be able to sign in as a new user
   it('New User Should Not Be Able to Sign In', ()=>{

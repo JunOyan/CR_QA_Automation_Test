@@ -10,7 +10,7 @@ describe('NBA Play Daily Games', () => {
     })
   });
   
-  //Expected result: Guests should be able to daily games
+  //Expected result: Guests should be able to enter daily games
   it('Guests Should Be Able to Enter Daily Games Without Login', () => {
     //go to home page
     cy.visit(_user_data.baseUrl);
