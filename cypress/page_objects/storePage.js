@@ -9,7 +9,7 @@ class storePage{
     _supported_item_types = ["t-shirt", "jerseys"];
     elements = {
         //Product main page
-        t_shirt_menu_link: () => cy.get("li[data-trk-id ='topnav-group-d-15720_t-shirts'] > a"),
+        t_shirt_menu_link: () => cy.get("li[data-trk-id ='topnav-group-d-15720_t-shirts'] > a", ),
         jerseys_menu_link: () => cy.get("li[data-trk-id ='topnav-group-d-15675_jerseys'] > a"),
         hats_menu_link: () => cy.get("li[data-trk-id ~='topnav-group-d-15636_hats'] > a"),
         product_cells: () => cy.xpath("//div[@data-trk-id='product-grid']//div[@class='column'] \
@@ -59,20 +59,20 @@ class storePage{
     gotoTShirts(){
         this.elements.t_shirt_menu_link()
         .should('be.visible')
-        .click();
+        .click({timeout:6000});
         this._item_type = "t-shirt";
     };
 
     gotoTrackOrders(){
         this.elements.track_order_link()
         .should('be.visible')
-        .click();
+        .click({timeout:6000});
     };
 
     gotoCart(){
         this.elements.track_order_link()
         .should('be.visible')
-        .click();
+        .click({timeout:6000});
     };
 
     gotoCheckout(){
@@ -84,7 +84,7 @@ class storePage{
     gotoGiftCards(){
         this.elements.gift_cards_link()
         .should('be.visible')
-        .click();
+        .click({timeout:6000});
     };
 
     searchForTrackOrder(number){

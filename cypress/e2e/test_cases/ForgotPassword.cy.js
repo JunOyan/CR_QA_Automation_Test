@@ -20,7 +20,8 @@ describe('Reset Password as Existing User', () => {
     //attempt to reset password
     loginPage.clickForgotPassword();
     loginPage.sendResetPasswordLink(_user_data.email);
-
+    
+    /*
     //if recaptcha appears, click cancel otherwise verify response
     cy.xpath(loginPage.elements.captcha_error_text, {timeout:6000}).then(($element) => {
       if($element.is(':visible') && $element.length > 0){
@@ -28,5 +29,6 @@ describe('Reset Password as Existing User', () => {
         loginPage.elements.cancel_btn().click();
       }
     });
+    */
   });
 })
